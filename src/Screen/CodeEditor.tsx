@@ -1,20 +1,21 @@
-
-import Editor from '../Components/Editor'
-import InputOutput from '../Components/InputOutput'
-import Userlist from '../Components/Userlist'
+import Editor from "../Components/Editor/Editor";
+import InputOutput from "../Components/Editor/InputOutput";
+import Prensenting from "../Components/Editor/Prensenting";
+import Userlist from "../Components/Editor/Userlist";
 
 const CodeEditor = () => {
   return (
-    <div className="h-full w-full flex justify-center items-center gap-2">
+    <div className="h-full w-full flex justify-around items-center gap-1 p-2 ">
       <div className="h-full w-full ">
-      <Editor/>
-      <InputOutput/>
+        <Prensenting />
+        <Editor />
+        <InputOutput />
       </div>
-      <div className="h-[88%] w-2/6">
-      <Userlist/> 
+      <div className="h-[93%] w-2/5 ">
+        <Userlist />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CodeEditor
+export default CodeEditor;
