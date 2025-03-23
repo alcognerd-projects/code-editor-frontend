@@ -1,18 +1,35 @@
+import { useState } from "react";
 
+const InputOutput = ({ output, err, setinput }) => {
+  const [value, setValue] = useState("");
 
-const InputOutput = () => {
+  const handleChange = (e) => {
+    setValue(e.target.value);
+    setinput(e.target.value); // Update the parent state
+  };
+
   return (
-    <div className="h-[24%] flex flex-col px-2 text-white">
-      <div className="w-full flex justify-around gap-3 ">
-          <p className="w-1/2  px-2">Input</p>
-          <p className="w-1/2  px-2 ">Output</p>
+    <div className="h-[25%] flex flex-col px-2 text-white">
+      <div className="w-full flex justify-around gap-3">
+        <p className="w-1/2 px-2">Input</p>
+        <p className="w-1/2 px-2">Output</p>
       </div>
       <div className="h-full w-full flex gap-3">
-          <textarea className="bg-black max-h-[135px] min-h-[135px] w-1/2 focus:ring-0 focus:outline-none rounded-xl border-2 border-violet-300"/>
-          <textarea className="bg-black max-h-[135px] min-h-[135px] w-1/2 focus:ring-0 focus:outline-none  rounded-xl border-2 border-violet-300 "/>
+        <textarea
+          value={value}
+          onChange={handleChange}
+          className="bg-gray-900 max-h-[150px] min-h-[150px] w-1/2 font-medium focus:ring-0 focus:outline-none rounded-xl border-2 border-violet-300 p-2 font-mono"
+        />
+        <textarea
+          value={err ? err : output}
+          readOnly
+          className={`font-medium bg-gray-900 max-h-[150px] min-h-[150px] w-1/2 focus:ring-0 focus:outline-none rounded-xl border-2 border-violet-300 p-3 overflow-y-auto font-mono ${
+            err ? "text-red-400" : "text-green-400"
+          }`}
+        />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default InputOutput
+export default InputOutput;

@@ -112,13 +112,13 @@ const Userlist = () => {
   };
 
   return (
-    <div className="h-full w-full bg-gray-900 border-2 border-blue-300 rounded-md flex flex-col text-slate-100 py-2">
-      <div className="h-[580px] w-full">
-        <ul className="h-full w-full grid grid-cols-2 gap-2 px-2 overflow-y-auto">
+    <div className="h-[90%] w-full   rounded-md flex flex-col gap-2 py-1 justify-between text-slate-100 py-2">
+      <div className="h-[560px] w-full border-2 border-blue-300 rounded-md p-1">
+        <ul className="h-full w-full grid grid-cols-1 gap-2 p-2 overflow-y-auto">
           {users.map((user, index) => (
             <li
               key={index}
-              className="bg-gray-700 p-2 h-[108px] rounded-md flex items-end justify-between">
+              className="bg-gray-700 p-2 h-[175px] rounded-md flex items-end justify-between">
               <button onClick={() => toggleMic(index)}>
                 {user.isMic ? (
                   <IoMdMic className="text-green-500 cursor-pointer text-xl " />
@@ -132,7 +132,6 @@ const Userlist = () => {
         </ul>
       </div>
 
-      {/* Controls */}
       <div className="h-[70px] w-full flex justify-around items-center p-2 rounded-md">
         <button className="py-2 px-8 bg-blue-700 rounded-md cursor-pointer text-white">
           <FaMicrophone />
