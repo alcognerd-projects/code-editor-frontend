@@ -1,5 +1,5 @@
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
     height: 5px;
 }
 
@@ -11,9 +11,13 @@
 ::-webkit-scrollbar-thumb {
     background: #444a56;
     border-radius: 5px;
-   
+
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #505868;
+    cursor: pointer;
+}
+.class {
+    background-color: #282c34;
 }

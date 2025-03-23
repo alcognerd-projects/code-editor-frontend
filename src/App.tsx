@@ -16,7 +16,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-[#1f1f1f] p-3 font-[Poppins] ">
+    <div className="h-screen  bg-[#1f1f1f] p-3 font-[Poppins] ">
       {showWarn ? <Warning /> : <CodeEditor />}
     </div>
   );

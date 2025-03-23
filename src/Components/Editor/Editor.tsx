@@ -6,77 +6,139 @@ import { python } from "@codemirror/lang-python";
 import { cpp } from "@codemirror/lang-cpp";
 import { useEffect, useRef, useState } from "react";
 
-
-const Editor = () => {
+const Editor = ({
+  setoutput,
+  input,
+  setErr,
+}: {
+  setoutput: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  const [loading, setLoading] = useState(false);
   const [lang, setLang] = useState(() => java());
-  const [SelecteLang, setSelecteLang] = useState("java");
-  const [defaultval, setDefaultval] = useState(`public class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello, Java!");
-    }
-}`);
+  const [selectedLang, setSelectedLang] = useState("java");
 
-  const myTheme = EditorView.theme({
-    ".cm-cursor": {
-      borderLeftWidth: "3px", // Increase cursor size
-    },
-  });
+  const [code, setCode] = useState(
+    `// class name should be Main
+    public class Main {
+        public static void main(String[] args) {
+                System.out.println("Hello, Java!");
+             }
+    }`
+  );
 
-  const editoraRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const editorInstance = useRef<EditorView | null>(null);
 
   useEffect(() => {
-    if (!editoraRef.current) return;
-    const view = new EditorView({
-      doc: defaultval,
-      extensions: [basicSetup, oneDark, lang, myTheme],
-      parent: editoraRef.current,
-    });
-    return () => {
-      view.destroy();
-    };
-  }, [lang, defaultval]);
+    if (!editorRef.current) return;
 
-  return (
-    <div className="h-[73%]  pt-2 flex flex-col gap-2 ">
-      <select
-        name=""
-        id=""
-        className=" border-2 w-36 border-green-600 bg-zinc-900 text-white rounded-md cursor-pointer p-1"
-        value={SelecteLang}
-        onChange={(e) => {
-          const selectLang = e.target.value;
-          setSelecteLang(selectLang);
-          if (selectLang === "java") {
-            setLang(java());
-            setDefaultval(
-              `public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java!");\n    }\n}`
-            );
-          } else if (selectLang === "cpp") {
-            setLang(cpp());
-            setDefaultval(
-              `#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello, C++!";\n    return 0;\n}`
-            );
-          } else {
-            setLang(python());
-            setDefaultval(`print("Hello, Python!")`);
+    if (editorInstance.current) {
+      editorInstance.current.destroy();
+    }
+
+    editorInstance.current = new EditorView({
+      doc: code, // Convert `\n` string to actual newlines
+      extensions: [
+        basicSetup,
+        oneDark,
+        lang,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            const newCode = update.state.doc.toString();
+            setCode(newCode); // Convert back to `\n` string
           }
-        }}>
-        <option value="cpp" >C++</option>
-        <option value="java">Java</option>
-        <option value="python">Python 3</option>
-      </select>
+        }),
+      ],
+      parent: editorRef.current,
+    });
 
-      <div className="h-full rounded-md overflow-y-scroll bg-[#282c34] text-lg">
-        <div
-          className="cm-cursor px-3"
-          ref={editoraRef}
-        />
+    return () => {
+      editorInstance.current?.destroy();
+    };
+  }, [lang]);
+
+  const handleRunCode = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("https://coderunner-h22r.onrender.com/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language: selectedLang,
+          code: code,
+          inputData: input,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log("Response:", data);
+      setoutput(data?.output);
+      setErr(data?.error);
+    } catch (error) {
+      console.error("Request failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <div className="h-[70%] p-2 flex flex-col gap-2">
+      <div className="flex justify-between">
+        <select
+          className="border-2 w-36 border-green-600 bg-zinc-900 text-white rounded-md cursor-pointer p-1"
+          value={selectedLang}
+          onChange={(e) => {
+            const newLang = e.target.value;
+            setSelectedLang(newLang);
+            if (newLang === "java") {
+              setLang(java());
+              setCode(
+                `// class name should be Main
+    public class Main {
+        public static void main(String[] args) {
+                System.out.println("Hello, Java!");
+           }
+    }`
+              );
+            } else if (newLang === "cpp") {
+              setLang(cpp());
+              setCode(
+                `#include <iostream> 
+using namespace std;
+int main() { 
+cout << "Hello, C++!"; 
+  return 0;
+  }`
+              );
+            } else if (newLang == "python") {
+              setLang(python());
+              setCode(`print("Hello, Python!")`);
+            }
+          }}>
+          <option value="cpp">C++</option>
+          <option value="java">Java</option>
+          <option value="python">Python 3</option>
+        </select>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={handleRunCode}
+            disabled={loading}
+            className="bg-green-500 w-24 p-1 rounded-md text-white font-bold cursor-pointer">
+            {loading ? "Runing" : "Run"}
+          </button>
+        </div>
       </div>
-      <div className="flex justify-end">
-        <button className="bg-green-500 w-24 p-1 rounded-md text-slate-50 font-bold cursor-pointer ">
-          Run
-        </button>
-      </div>
+
+      {/* Code Editor */}
+      <div
+        ref={editorRef}
+        className="h-full w-full bg-[#282c34] rounded-md text-lg"
+      />
     </div>
   );
 };
